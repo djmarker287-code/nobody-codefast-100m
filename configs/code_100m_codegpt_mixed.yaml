@@ -1,0 +1,32 @@
+model:
+  vocab_size: 50002
+  context_length: 65536
+  hidden_size: 768
+  num_layers: 8
+  num_heads: 12
+  intermediate_size: 2304
+  dropout: 0.0
+  rope_theta: 1000000
+  bos_token_id: 0
+  eos_token_id: 2
+  pad_token_id: 1
+  tie_word_embeddings: true
+data:
+  validation_fraction: 0.01
+  min_chars: 1
+  max_chars: 1000000
+  seed: 1337
+training:
+  seed: 1337
+  learning_rate: 0.000005
+  min_learning_rate: 0.0000005
+  weight_decay: 0.005
+  warmup_steps: 100
+  max_grad_norm: 1.0
+  batch_size: 1
+  grad_accumulation: 1
+  max_steps: 1000
+  eval_every: 100
+  save_every: 100
+  log_every: 25
+  precision: auto

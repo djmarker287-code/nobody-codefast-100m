@@ -1,0 +1,28 @@
+model:
+  vocab_size: 18432
+  context_length: 65536
+  hidden_size: 768
+  num_layers: 12
+  num_heads: 12
+  intermediate_size: 1536
+  dropout: 0.0
+  rope_theta: 1000000.0
+data:
+  validation_fraction: 0.01
+  min_chars: 80
+  max_chars: 200000
+  seed: 1337
+training:
+  seed: 1337
+  learning_rate: 0.0003
+  min_learning_rate: 0.00003
+  weight_decay: 0.1
+  warmup_steps: 2000
+  max_grad_norm: 1.0
+  batch_size: 4
+  grad_accumulation: 16
+  max_steps: 100000
+  eval_every: 500
+  save_every: 500
+  log_every: 10
+  precision: auto

@@ -1,0 +1,22 @@
+# Local environments and caches
+.venv/
+__pycache__/
+*.py[cod]
+unsloth_compiled_cache/
+.cache/
+
+# Local corpora, checkpoints, and generated artifacts
+work/
+outputs/
+packages/
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.gguf
+
+# Local logs and editor files
+*.log
+.idea/
+.vscode/
