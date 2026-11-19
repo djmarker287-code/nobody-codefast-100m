@@ -14,6 +14,82 @@ CodeGPT-compatible byte-level BPE vocabulary, 8 rotary-attention transformer blo
 12 attention heads, and a 65,536-token context window. Rotary positions provide 64k context without adding
 a learned position-embedding table.
 
+## Step-by-step: use the model
+
+These commands are for Windows PowerShell. The public repository contains the
+code, but not the very large local checkpoint files. On the training computer,
+the selected checkpoint is `outputs\codefast-appstack-v2\step-1100`.
+
+1. **Clone the repository and enter it.**
+
+   ```powershell
+   git clone https://github.com/djmarker287-code/nobody-codefast-100m.git
+   cd nobody-codefast-100m
+   ```
+
+2. **Create the Python environment.** Python 3.12 is recommended.
+
+   ```powershell
+   uv venv .venv --python 3.12
+   uv pip install --python .venv\Scripts\python.exe -r requirements.txt
+   ```
+
+3. **Run a normal coding prompt.** Replace the checkpoint path if your model
+   files are stored somewhere else.
+
+   ```powershell
+   .venv\Scripts\python.exe scripts\sample.py `
+     --checkpoint outputs\codefast-appstack-v2\step-1100 `
+     --prompt "def add_numbers(a, b):" `
+     --max-new-tokens 120
+   ```
+
+4. **Use the checked Python mode when you want a syntax safety check.** It
+   returns `valid_python: false` instead of pretending malformed output is
+   valid code.
+
+   ```powershell
+   .venv\Scripts\python.exe scripts\generate_checked.py `
+     --checkpoint outputs\codefast-appstack-v2\step-1100 `
+     --prompt "def fibonacci(n):"
+   ```
+
+5. **Use the web route for JavaScript, TypeScript, SQL, HTML, or CSS.**
+
+   ```powershell
+   .venv\Scripts\python.exe scripts\run_codefast.py `
+     --checkpoint outputs\codefast-appstack-v2\step-1100 `
+     --web-checkpoint outputs\codefast-web-v2\final `
+     --prompt "function addNumbers(a, b) {"
+   ```
+
+6. **Always review and test the result.** This is an experimental small model;
+   do not run generated code against real data or production systems without
+   human review, tests, dependency checks, and security checks.
+
+### Is ROCm right for your computer?
+
+ROCm is AMD's GPU software stack. On your computer it is partially useful:
+Unsloth detected the Radeon AI PRO R9700 and GPU inference worked, but the
+installed Windows ROCm/HIP runtime crashed during training backpropagation.
+The older integrated Radeon was excluded because the installed PyTorch build
+did not contain compatible kernels.
+
+For now, use ROCm/Unsloth for experimentation and inference, but use the safe
+CPU fallback for training:
+
+```powershell
+C:\Users\Marco\.unsloth\studio\unsloth_studio\Scripts\python.exe `
+  scripts\train_unsloth.py `
+  --data work\code.jsonl --language Python `
+  --out outputs\unsloth-run --steps 100 --seq-len 1024 --cpu
+```
+
+Longer GPU training becomes sensible after moving to a known-compatible
+ROCm/PyTorch/Unsloth combination, usually on a supported Linux setup or after
+the Windows HIP issue is resolved. You do not need to reinstall ROCm just to
+run the model on CPU.
+
 ## Quick start
 
 Use Python 3.12 and install the pinned runtime:
