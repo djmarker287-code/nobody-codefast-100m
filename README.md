@@ -67,6 +67,17 @@ the selected checkpoint is `outputs\codefast-appstack-v2\step-1100`.
    do not run generated code against real data or production systems without
    human review, tests, dependency checks, and security checks.
 
+7. **Use an interactive PowerShell chat if you do not want to repeat the full
+   command.** It is CPU-only by default; type prompts after the `You>` line.
+
+   ```powershell
+   .venv\Scripts\python.exe scripts\chat.py `
+     --checkpoint outputs\codefast-appstack-v2\step-1100
+   ```
+
+   Type `exit` or `quit` to close it. Add `--temperature 0` for deterministic
+   decoding.
+
 ### Is ROCm right for your computer?
 
 ROCm is AMD's GPU software stack. On your computer it is partially useful:
@@ -111,7 +122,7 @@ The Unsloth Studio environment can run the same Llama checkpoint on its configur
 
 ```powershell
 C:\Users\Marco\.unsloth\studio\unsloth_studio\Scripts\python.exe scripts\train_unsloth.py `
-  --data work\code.jsonl --language Python --out outputs\unsloth-run --steps 100 --seq-len 1024
+  --data work\code.jsonl --language Python --out outputs\unsloth-run --steps 100 --seq-len 1024 --cpu
 ```
 
 On this Windows/ROCm machine, the accelerator currently crashes inside the installed HIP DLL. Use
@@ -129,7 +140,8 @@ For real training, provide a large JSONL corpus with a `text` field:
   --out outputs\codefast-100m `
   --tokens 2000000000 `
   --batch-size 4 `
-  --grad-accum 16
+  --grad-accum 16 `
+  --device cpu
 ```
 
 The trainer streams data, packs examples into fixed-length sequences, saves resumable checkpoints,

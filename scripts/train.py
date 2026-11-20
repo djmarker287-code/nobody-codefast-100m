@@ -183,6 +183,7 @@ def main() -> None:
     parser.add_argument("--seq-len", type=int, help="training sequence length; defaults to 1024 for smoke, otherwise 65536")
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--resume")
+    parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu", help="training device; CPU is the safe default")
     args = parser.parse_args()
     cfg = yaml.safe_load(Path(args.config).read_text(encoding="utf-8"))
     if args.smoke:
@@ -210,7 +211,9 @@ def main() -> None:
     print(f"trainable parameters: {params:,}")
     if not 95_000_000 <= params <= 105_000_000:
         raise RuntimeError(f"model is not approximately 100M parameters: {params}")
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if args.device == "cuda" and not torch.cuda.is_available():
+        raise RuntimeError("--device cuda was requested, but this PyTorch environment has no usable CUDA GPU")
+    device = torch.device(args.device)
     precision = cfg["training"]["precision"]
     if precision == "auto": precision = "bf16" if device.type == "cuda" and torch.cuda.is_bf16_supported() else ("fp16" if device.type == "cuda" else "fp32")
     autocast_dtype = torch.bfloat16 if precision == "bf16" else (torch.float16 if precision == "fp16" else None)

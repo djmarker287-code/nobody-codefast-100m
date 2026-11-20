@@ -20,13 +20,17 @@ def main() -> None:
     parser.add_argument("--language")
     parser.add_argument("--steps", type=int, default=100)
     parser.add_argument("--seq-len", type=int, default=1024)
-    parser.add_argument("--cpu", action="store_true", help="disable the ROCm accelerator and use CPU fallback")
+    device_group = parser.add_mutually_exclusive_group()
+    device_group.add_argument("--cpu", dest="cpu", action="store_true", help="use CPU training (default)")
+    device_group.add_argument("--gpu", dest="cpu", action="store_false", help="opt into the Unsloth accelerator")
+    parser.set_defaults(cpu=True)
     args, unknown = parser.parse_known_args()
     if args.cpu:
         os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
     os.environ.setdefault("UNSLOTH_RETURN_LOGITS", "1")
-    print("Using the Unsloth Studio Python runtime and its accelerator; standard Transformers fallback is intentional on Windows/ROCm when Unsloth kernels cannot load.")
-    sys.argv = ["train.py", "--data", args.data, "--out", args.out, "--steps", str(args.steps), "--seq-len", str(args.seq_len), "--smoke"]
+    mode = "CPU-only training" if args.cpu else "the Unsloth accelerator"
+    print(f"Using the Unsloth Studio Python runtime with {mode}.")
+    sys.argv = ["train.py", "--data", args.data, "--out", args.out, "--steps", str(args.steps), "--seq-len", str(args.seq_len), "--smoke", "--device", "cpu" if args.cpu else "cuda"]
     if args.language:
         sys.argv += ["--language", args.language]
     sys.argv += unknown
